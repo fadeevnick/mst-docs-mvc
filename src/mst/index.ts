@@ -1,4 +1,4 @@
-import { destroy, getRoot, types } from 'mobx-state-tree'
+import { destroy, getRoot, types, Instance } from 'mobx-state-tree'
 import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from "../constants/TodoFilters";
 
 const filterType = types.union(...[SHOW_ALL, SHOW_COMPLETED, SHOW_ALL].map(types.literal))
@@ -39,7 +39,7 @@ const TodoStore = types.model({
     get activeCount() {
       return self.todos.length - self.todos.filter((todo) => todo.completed).length;
     },
-    getFilteredTodos() {
+    get filteredTodos() {
       //@ts-ignore
       return self.todos.filter(TODO_FILTERS[self.filter])
     }
@@ -65,3 +65,5 @@ const TodoStore = types.model({
 }))
 
 export default TodoStore;
+export interface TodoType extends Instance<typeof Todo> { };
+export interface TodoStoreType extends Instance<typeof TodoStore> { };

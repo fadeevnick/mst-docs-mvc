@@ -14,6 +14,8 @@ const Header = observer((props: HeaderPropsType) => {
   }
   return <div>
     <h1>todos</h1>
-    <TodoTextInput onSave={handleSave} />
+    <TodoTextInput onSave={handleSave} text={""}/>
   </div>
 })
+
+export default Header;
