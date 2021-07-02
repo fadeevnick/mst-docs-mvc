@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import TodoItem from './TodoItem';
 import { observer } from 'mobx-react';
 import { useStore } from '../StateProvider';
+import { TodoType } from '../mst';
+import Footer from './Footer';
 
 function MainSection() {
   const { todosStore: store } = useStore();
@@ -23,23 +25,17 @@ function MainSection() {
         }
     }
 
-    // function renderFooter() {
-    //     if (store.todos.length) {
-    //         return <Footer store={store} />
-    //     }
-    // }
-
   const { filteredTodos } = store;
 
     return (
         <section className="main">
             {renderToggleAll()}
             <ul className="todo-list">
-                {filteredTodos.map((todo: any) => (
+                {filteredTodos.map((todo: TodoType) => (
                     <TodoItem key={todo.id} todo={todo} />
                 ))}
             </ul>
-            {/* {renderFooter()} */}
+            {store.todos.length && <Footer />}
         </section>
     )
 }

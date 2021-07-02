@@ -1,11 +1,29 @@
 import { destroy, getRoot, types, Instance } from 'mobx-state-tree'
 import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from "../constants/TodoFilters";
+import { FiltersType } from '../constants/TodoFilters';
 
-const filterType = types.union(...[SHOW_ALL, SHOW_COMPLETED, SHOW_ALL].map(types.literal))
+// const filterType = types.union(...[SHOW_ALL, SHOW_COMPLETED, SHOW_ALL].map(types.literal))
+const filterType = types.custom<string, FiltersType>({
+  name: "FilterType",
+  fromSnapshot(value: string) {
+    return value as FiltersType;
+  },
+  toSnapshot(value: FiltersType) {
+    return value.toString();
+  },
+  isTargetType(value: string) {
+    return value as FiltersType !== undefined;
+  },
+  getValidationMessage(value: string) {
+    if (this.isTargetType(value)) return ''
+    return "It's not the FiltersType";
+  }
+});
+
 const TODO_FILTERS = {
   [SHOW_ALL]: () => true,
-  [SHOW_ACTIVE]: (todo: any) => !todo.completed,
-  [SHOW_COMPLETED]: (todo: any) => todo.completed
+  [SHOW_ACTIVE]: (todo: TodoType) => !todo.completed,
+  [SHOW_COMPLETED]: (todo: TodoType) => todo.completed
 }
 
 const Todo = types.model({
@@ -40,7 +58,6 @@ const TodoStore = types.model({
       return self.todos.length - self.todos.filter((todo) => todo.completed).length;
     },
     get filteredTodos() {
-      //@ts-ignore
       return self.todos.filter(TODO_FILTERS[self.filter])
     }
   }))
@@ -49,7 +66,7 @@ const TodoStore = types.model({
       const id = self.todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1
       self.todos.unshift({ id, text })
     },
-    removeTodo(todo: any) {
+    removeTodo(todo: TodoType) {
       destroy(todo)
     },
     completeAll() {
@@ -59,7 +76,7 @@ const TodoStore = types.model({
     clearCompleted() {
       self.todos.replace(self.todos.filter((todo) => !todo.completed));
     },
-    setFilter(filter: string) {
+    setFilter(filter: FiltersType) {
       self.filter = filter;
     }
 }))
